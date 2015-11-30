@@ -1,4 +1,4 @@
-package io.github.alexandrosd.excelhelper
+package xlsreader
 
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
@@ -82,15 +82,20 @@ class ExcelSheet {
      * @param valueColumnId
      * @return
      */
-    public List<Map<String, String>> getKeyValuePairs(int firstRow, int lastRow, int keyColumnId, int valueColumnId) {
-        List< Map<String, String>> pairs = new ArrayList<Map<String, String>>()
+    public Map<String, String> getKeyValuePairs(int firstRow, int lastRow, int keyColumnId, int valueColumnId) {
+        Map<String, String> pairs = new HashMap<String, String>()
 
         for (int i = firstRow; i <= lastRow; i++) {
-            Map<String, String> pair = new HashMap<String, String>();
-            String key = getCellValue(keyColumnId, i)
-            String value = getCellValue(valueColumnId, i)
-            pair.put(key, value)
-            pairs.add(pair)
+            try {
+                String key = getCellValue(keyColumnId, i)
+                String value = getCellValue(valueColumnId, i)
+                if (key.length() > 0 && value.length() > 0) {
+                    pairs.put(key.trim(), value.trim())
+                }
+            }
+            catch(e) {
+                // There are cases where the iterator continues past the last row, just catch the exception for now
+            }
         }
         return pairs
     }
@@ -102,7 +107,7 @@ class ExcelSheet {
      * @param valueColumnId
      * @return
      */
-    public List<Map<String, String>> getKeyValuePairs(int firstRow, int keyColumnId, int valueColumnId) {
+    public Map<String, String> getKeyValuePairs(int firstRow, int keyColumnId, int valueColumnId) {
         return getKeyValuePairs(firstRow, sheet.getLastRowNum(), keyColumnId, valueColumnId)
     }
 }
